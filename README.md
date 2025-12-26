@@ -150,7 +150,48 @@ Where:
 - Experiment with more advanced models (e.g., XGBoost, LightGBM) and anomaly detection approaches.
 
 
+Model
+I use XGBoost as the final model for fraud detection in this project. It achieves approximately ROC‑AUC 0.98, with precision and recall around 0.84 on the fraud class on the held‑out test set.​
 
+How I run the project
+1. Run the EDA notebook
+I activate my virtual environment and start Jupyter:
+
+bash
+source venv/bin/activate
+jupyter notebook
+Then I open notebooks/eda.ipynb and run the cells to explore the dataset, compare models, and generate evaluation metrics.​
+
+2. Use src/predict_single.py for batch scoring
+I save a CSV of new transactions (same schema as the training data) and then run:
+
+bash
+source venv/bin/activate
+python src/predict_single.py \
+  --input_path data/new_transactions.csv \
+  --output_path data/predictions.csv
+This script loads my trained XGBoost model, scores each transaction, and writes out fraud probabilities and binary predictions to data/predictions.csv.​
+
+3. Start the FastAPI app and hit the API
+I start the FastAPI server from the project root:
+
+bash
+source venv/bin/activate
+uvicorn api.main:app --reload --port 8000
+Once the server is running, I send a sample request to /predict:
+
+bash
+curl -X POST "http://127.0.0.1:8000/predict" \
+  -H "Content-Type: application/json" \
+  -d '{
+        "Time": 0,
+        "V1": 1.23,
+        "V2": -0.45,
+        "V3": 0.67,
+        "...": 0.0,
+        "Amount": 100.0
+      }'
+The API responds with a JSON object containing the fraud probability and a predicted fraud label for that transaction.
 
 
 
