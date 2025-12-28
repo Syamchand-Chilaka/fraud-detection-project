@@ -143,13 +143,6 @@ Where:
 - `fraud_probability` is the model’s estimated probability that the transaction is fraudulent (between 0 and 1).
 - `fraud_prediction` is the binary decision (1 = predicted fraud, 0 = predicted normal).
 
-## Future Work
-
-- Deploy the FastAPI service behind a production server (e.g., Docker + cloud).
-- Add a small web UI (Streamlit or React) to upload CSVs and visualize high-risk transactions.
-- Experiment with more advanced models (e.g., XGBoost, LightGBM) and anomaly detection approaches.
-
-
 Model
 I use XGBoost as the final model for fraud detection in this project. It achieves approximately ROC‑AUC 0.98, with precision and recall around 0.84 on the fraud class on the held‑out test set.​
 

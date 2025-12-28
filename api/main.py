@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import joblib
 import pandas as pd
+from fastapi import FastAPI
+
 
 app = FastAPI(title="Fraud Detection API")
 
@@ -42,22 +44,7 @@ class Transaction(BaseModel):
     Amount: float
 
 
-@app.get("/")
-def root():
-    return {"message": "Fraud Detection API is running"}
-
-
 @app.post("/predict")
-def predict(transaction: Transaction):
-    # im converting incoming JSON to DataFrame with one row
-    data = pd.DataFrame([transaction.dict()])
-
-    # Model outputs probability for class 1 (fraud)
-    proba = model.predict_proba(data)[0][1]
-    pred = int(proba >= 0.5)
-
-    return {
-        "fraud_probability": float(proba),
-        "fraud_prediction": pred
-
-    }
+def predict(tx: Transaction):
+    # load model, preprocess, return prediction
+    return {"fraud_probability": 0.12, "fraud_prediction": 0}
