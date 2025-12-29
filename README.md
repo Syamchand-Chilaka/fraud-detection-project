@@ -1,3 +1,6 @@
+Here's your complete README with Docker section added:
+
+text
 # Credit Card Fraud Detection
 
 End-to-end machine learning project to detect fraudulent credit card transactions, built to handle highly imbalanced data and provide actionable fraud risk scores for each transaction.
@@ -8,6 +11,7 @@ This project implements a complete fraud detection pipeline:
 - **ML Model**: XGBoost binary classifier achieving 0.98 ROC-AUC
 - **REST API**: FastAPI backend for real-time predictions
 - **Web UI**: Streamlit interface for batch transaction scoring
+- **Containerization**: Docker support for reproducible deployment
 
 ## Dataset
 
@@ -25,7 +29,7 @@ This project implements a complete fraud detection pipeline:
   - F1-Score: **0.84**
 
 - **Baseline Comparison**: Tested Logistic Regression and Random Forest; XGBoost performed best on imbalanced data
-- **Handling Imbalance**: Used `class_weight='balanced'` to handle 99.8% legitimate transactions
+- **Handling Imbalance**: Used `scale_pos_weight` parameter to handle 99.8% legitimate transactions
 
 ## Project Structure
 
@@ -41,21 +45,57 @@ fraud_detection_project/
 │ └── main.py # FastAPI backend
 ├── ui/
 │ └── app_standalone.py # Streamlit web interface
+├── Dockerfile # Docker container definition
+├── .dockerignore # Docker ignore patterns
 ├── requirements.txt # Python dependencies
 └── README.md # This file
 
 text
 
+---
+
 ## Installation
 
-### 1. Clone the repository
+### Method 1: Docker (Recommended) 🐳
+
+**Prerequisites**: Install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+
+#### Build the Docker image
+
+git clone https://github.com/Syamchand-Chilaka/fraud-detection-project.git
+cd fraud-detection-project
+docker build -t fraud-detection-app .
+
+text
+
+#### Run the container
+
+docker run -p 8501:8501 fraud-detection-app
+
+text
+
+#### Access the app
+
+Open your browser to [http://localhost:8501](http://localhost:8501)
+
+**Benefits of Docker:**
+- No Python/dependency installation needed
+- Runs identically on any machine (Mac, Windows, Linux)
+- Production-ready deployment
+- Isolated from system Python
+
+---
+
+### Method 2: Local Python Setup
+
+#### 1. Clone the repository
 
 git clone https://github.com/Syamchand-Chilaka/fraud-detection-project.git
 cd fraud-detection-project
 
 text
 
-### 2. Create and activate virtual environment
+#### 2. Create and activate virtual environment
 
 **macOS/Linux:**
 python3 -m venv venv
@@ -69,16 +109,17 @@ venv\Scripts\activate
 
 text
 
-### 3. Install dependencies
+#### 3. Install dependencies
 
 pip install --upgrade pip
 pip install -r requirements.txt
 
 text
 
-### 4. Download dataset
+#### 4. Download dataset
 
 Download the Kaggle Credit Card Fraud Detection dataset and place `creditcard.csv` in the `data/` folder:
+
 Download from: https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud
 Then move to:
 data/creditcard.csv
@@ -91,8 +132,12 @@ text
 
 ### Option 1: Web UI (Streamlit) ⭐ **RECOMMENDED**
 
-Start the interactive Streamlit app to upload CSV and see predictions:
+#### With Docker:
+docker run -p 8501:8501 fraud-detection-app
 
+text
+
+#### Without Docker:
 source venv/bin/activate
 streamlit run ui/app_standalone.py
 
@@ -101,8 +146,7 @@ text
 Then open your browser to `http://localhost:8501` and:
 1. Click **Browse files**
 2. Upload a CSV with transactions (same schema as training data)
-3. Click **Score transactions**
-4. View predictions table with `fraud_probability` and `fraud_prediction` columns
+3. View predictions table with `fraud_probability` and `fraud_prediction` columns
 
 **Example output:**
 Processed 284,807 transactions
@@ -228,13 +272,60 @@ This creates `data/predictions.csv` with all original columns plus:
 
 ---
 
+## Docker Details
+
+### Dockerfile
+
+The project includes a `Dockerfile` that:
+- Uses Python 3.13 slim base image
+- Installs all dependencies from `requirements.txt`
+- Copies project files
+- Exposes port 8501 for Streamlit
+- Runs Streamlit app on container startup
+
+### Build and Run Commands
+
+Build image
+docker build -t fraud-detection-app .
+
+Run container (Streamlit UI)
+docker run -p 8501:8501 fraud-detection-app
+
+Run container with custom name
+docker run -p 8501:8501 --name fraud-ui fraud-detection-app
+
+Run in background (detached mode)
+docker run -d -p 8501:8501 --name fraud-ui fraud-detection-app
+
+Stop container
+docker stop fraud-ui
+
+Remove container
+docker rm fraud-ui
+
+View logs
+docker logs fraud-ui
+
+text
+
+### Docker Ignore
+
+The `.dockerignore` file excludes:
+- `venv/` (virtual environment)
+- `__pycache__/` (Python cache)
+- `.git/` (Git history)
+- `data/creditcard.csv` (large dataset - download separately)
+
+---
+
 ## Key Technical Decisions
 
 1. **XGBoost over Random Forest**: Better performance on imbalanced data with faster inference
-2. **Class Weighting**: Used `class_weight='balanced'` to handle extreme imbalance without data loss
+2. **Class Weighting**: Used `scale_pos_weight` to handle extreme imbalance without data loss
 3. **ROC-AUC as Primary Metric**: More informative than accuracy for imbalanced classification
 4. **Joblib Serialization**: Standard in ML for fast model persistence
 5. **Standalone Streamlit**: Direct model loading avoids network complexity and improves reliability
+6. **Docker Containerization**: Ensures reproducibility and simplifies deployment
 
 ## Skills Demonstrated
 
@@ -243,17 +334,40 @@ This creates `data/predictions.csv` with all original columns plus:
 - **API Development**: FastAPI, REST endpoints, request validation
 - **Web Development**: Streamlit, interactive UIs, file upload handling
 - **MLOps**: Model versioning, reproducible pipelines, environment management
+- **DevOps**: Docker containerization, multi-environment deployment
 - **Version Control**: Git, GitHub, clean commit history
 - **Problem Solving**: Debugged macOS networking issues, optimized model performance
 
+## Architecture
+
+┌─────────────────────────────────────────┐
+│ Docker Container │
+│ ┌───────────────────────────────────┐ │
+│ │ Streamlit Web UI (Port 8501) │ │
+│ │ - File Upload │ │
+│ │ - Batch Scoring │ │
+│ │ - Results Display │ │
+│ └──────────────┬────────────────────┘ │
+│ │ │
+│ ┌──────────────▼────────────────────┐ │
+│ │ XGBoost Model (fraud_model.joblib)│
+│ │ - Load from disk │ │
+│ │ - Predict fraud probability │ │
+│ └───────────────────────────────────┘ │
+└─────────────────────────────────────────┘
+
+text
+
 ## Future Enhancements
 
-- Deploy Streamlit app to Streamlit Cloud (free)
+- Deploy Streamlit app to Streamlit Cloud (free hosting)
 - Deploy FastAPI to cloud (Render, Railway, AWS)
 - Add model monitoring and prediction logging
-- Create Docker container for easy deployment
+- Implement Docker Compose for multi-container setup (API + UI)
 - Add threshold tuning UI (adjust fraud cutoff dynamically)
 - Implement feature importance visualizations
+- Add CI/CD pipeline with GitHub Actions
+- Create Kubernetes deployment manifests
 
 ## Requirements
 
@@ -270,7 +384,23 @@ joblib>=1.2.0
 
 text
 
-## How to Reproduce
+## Quick Start (Docker)
+
+1. Clone repo
+git clone https://github.com/Syamchand-Chilaka/fraud-detection-project.git
+cd fraud-detection-project
+
+2. Build Docker image
+docker build -t fraud-detection-app .
+
+3. Run container
+docker run -p 8501:8501 fraud-detection-app
+
+4. Open browser to http://localhost:8501
+5. Upload creditcard.csv and view predictions
+text
+
+## Quick Start (Local Python)
 
 1. Clone repo
 git clone https://github.com/Syamchand-Chilaka/fraud-detection-project.git
@@ -286,12 +416,56 @@ Download creditcard.csv from Kaggle and place in data/
 4. Run Streamlit app
 streamlit run ui/app_standalone.py
 
-5. Upload creditcard.csv and click "Score transactions"
+5. Open browser to http://localhost:8501 and upload CSV
+text
+
+## Troubleshooting
+
+### Docker Issues
+
+**Container won't start:**
+Check Docker is running
+docker ps
+
+View container logs
+docker logs <container-id>
+
+Rebuild without cache
+docker build --no-cache -t fraud-detection-app .
+
+text
+
+**Port already in use:**
+Use different port
+docker run -p 8502:8501 fraud-detection-app
+
+Then access at http://localhost:8502
+text
+
+### Python Issues
+
+**Import errors:**
+Reinstall dependencies
+pip install --upgrade -r requirements.txt
+
+text
+
+**Streamlit won't start:**
+Check virtual environment is activated
+which python # Should show path to venv
+
+Try explicit command
+python -m streamlit run ui/app_standalone.py
+
 text
 
 ## Author
 
-Built as an end-to-end ML project for portfolio and learning.
+Built by [Your Name] as an end-to-end ML project demonstrating:
+- Production ML pipelines
+- API development
+- Interactive web applications
+- Containerization and deployment
 
 ## License
 
@@ -303,3 +477,24 @@ MIT License
 - XGBoost: [XGBoost Documentation](https://xgboost.readthedocs.io/)
 - FastAPI: [FastAPI Documentation](https://fastapi.tiangolo.com/)
 - Streamlit: [Streamlit Documentation](https://docs.streamlit.io/)
+- Docker: [Docker Documentation](https://docs.docker.com/)
+
+---
+
+## Screenshots
+
+### Streamlit Web UI
+![Streamlit UI](screenshots/streamlit-ui.png)
+*Interactive fraud detection interface with CSV upload and batch scoring*
+
+### FastAPI Swagger Docs
+![FastAPI Docs](screenshots/fastapi-docs.png)
+*Interactive API documentation with request/response examples*
+
+### Model Performance
+![Confusion Matrix](screenshots/confusion-matrix.png)
+*XGBoost performance on imbalanced fraud dataset*
+
+---
+
+**⭐ Star this repo if you find it useful!**

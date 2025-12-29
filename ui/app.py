@@ -1,9 +1,9 @@
+import os
 import requests
 import pandas as pd
 import streamlit as st
 
-API_URL = "http://192.168.1.196:8002/predict"
-
+API_URL = os.getenv("API_URL", "http://localhost:8002") + "/predict"
 st.title("Credit Card Fraud Detector")
 
 uploaded = st.file_uploader("Upload transactions CSV", type=["csv"])

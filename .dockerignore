@@ -1,0 +1,9 @@
+cat > .dockerignore << 'EOF'
+venv/
+__pycache__/
+*.pyc
+.git/
+.DS_Store
+.ipynb_checkpoints/
+data/creditcard.csv
+EOF

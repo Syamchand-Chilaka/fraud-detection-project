@@ -7,6 +7,12 @@ from fastapi import FastAPI
 
 app = FastAPI(title="Fraud Detection API")
 
+
+@app.get("/health")
+def health_check():
+    return {"status": "healthy", "service": "fraud-detection-api"}
+
+
 MODEL_PATH = "src/fraud_model.joblib"
 model = joblib.load(MODEL_PATH)
 

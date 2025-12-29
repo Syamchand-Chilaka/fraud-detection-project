@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  api:
+    build: .
+    container_name: fraud-detection-api
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data
+    networks:
+      - fraud-net
+
+  ui:
+    build: .
+    container_name: fraud-detection-ui
+    command: streamlit run ui/app.py --server.port=8501 --server.address=0.0.0.0
+    ports:
+      - "8501:8501"
+    depends_on:
+      - api
+    environment:
+      - API_URL=http://api:8002
+    networks:
+      - fraud-net
+
+networks:
+  fraud-net:
+    driver: bridge
