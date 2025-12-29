@@ -1,2 +1,4 @@
 data/predictions.csv
 data/creditcard.csv
+data/predictions_ab.csv
+data/*.csv

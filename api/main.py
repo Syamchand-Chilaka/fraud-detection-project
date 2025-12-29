@@ -1,23 +1,26 @@
+from src.ab_testing import ABTestingManager
 from fastapi import FastAPI
 from pydantic import BaseModel
 import joblib
 import pandas as pd
-from fastapi import FastAPI
+import sys
+sys.path.append("src")
 
 
-app = FastAPI(title="Fraud Detection API")
+app = FastAPI(title="Fraud Detection API with A/B Testing",
+              description="Compare XGBoostvs Random Forest models in production",
+              version="2.0"
+              )
 
-
-@app.get("/health")
-def health_check():
-    return {"status": "healthy", "service": "fraud-detection-api"}
-
-
-MODEL_PATH = "src/fraud_model.joblib"
-model = joblib.load(MODEL_PATH)
+ab_manager = ABTestingManager(
+    model_a_path="src/fraud_model_xgboost.joblib",
+    model_b_path="src/fraud_model_rf.joblib",
+    split_ratio=0.5
+)
 
 
 class Transaction(BaseModel):
+    """Credit Card Transaction Schema"""
     Time: float
     V1: float
     V2: float
@@ -50,7 +53,37 @@ class Transaction(BaseModel):
     Amount: float
 
 
+@app.get("/")
+def root():
+    """"Health check endpoint"""
+    return {
+        "message": "Fraud Detection API with A/B Testing",
+        "version": "2.0",
+        "status": "running",
+        "models": {
+            "model_a": "XGBoost",
+            "model_b": "Random Forest"
+        }
+    }
+
+
 @app.post("/predict")
-def predict(tx: Transaction):
-    # load model, preprocess, return prediction
-    return {"fraud_probability": 0.12, "fraud_prediction": 0}
+def predict(trans: Transaction):
+    """Predict fraud using A/B testing"""
+    # Convert to DataFrame
+    df = pd.DataFrame([trans.model_dump()])
+    result = ab_manager.predict(df)
+
+    return result
+
+
+@app.get("/ab-stats")
+def ab_stats():
+    """Get A/B testing statistics"""
+    return ab_manager.get_stats()
+
+
+@app.post("/ab-clear-logs")
+def ab_clear_logs():
+    """Clear all A/B test logs"""
+    return ab_manager.clear_logs()
