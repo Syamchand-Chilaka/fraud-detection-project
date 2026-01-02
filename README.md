@@ -106,7 +106,7 @@ Download creditcard.csv
 Place in data/creditcard.csv
 
 Usage
-Option 1: Batch Prediction Script ⭐ RECOMMENDED FOR LARGE DATASETS
+Option 1: Batch Prediction Script  RECOMMENDED FOR LARGE DATASETS
 Process all 284K transactions efficiently:
 
 bash
@@ -134,7 +134,7 @@ Running predictions on 284807 rows...
 Predicting: 100%|██████████| 284807/284807 [41:20<00:00, 114.82it/s]
 Saving results to: data/predictions_ab.csv
 Done! Results saved with 284807 predictions.
-Option 2: A/B Test Results Viewer (Streamlit) ⭐ BEST FOR VISUALIZATION
+Option 2: A/B Test Results Viewer (Streamlit)  BEST FOR VISUALIZATION
 View precomputed A/B test results interactively:
 
 bash
@@ -460,4 +460,4 @@ Streamlit: Streamlit Documentation
 
 A/B Testing: Practical Statistics for Data Scientists
 
-⭐ Star this repo if you find it useful for learning ML deployment and A/B testing!
+ Star this repo if you find it useful for learning ML deployment and A/B testing!
