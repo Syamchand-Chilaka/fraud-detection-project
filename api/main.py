@@ -4,6 +4,7 @@ from pydantic import BaseModel
 import joblib
 import pandas as pd
 import sys
+from pathlib import Path
 sys.path.append("src")
 
 
@@ -14,9 +15,18 @@ app = FastAPI(title="Fraud Detection API with A/B Testing",
 
 # Run with: uvicorn api.main:app --reload --port 8002
 
+# Validate models exist before initializing
+model_a_path = "src/fraud_model_xgboost.joblib"
+model_b_path = "src/fraud_model_rf.joblib"
+
+if not Path(model_a_path).exists():
+    raise FileNotFoundError(f"Model A not found at {model_a_path}. Please train models first.")
+if not Path(model_b_path).exists():
+    raise FileNotFoundError(f"Model B not found at {model_b_path}. Please train models first.")
+
 ab_manager = ABTestingManager(
-    model_a_path="src/fraud_model_xgboost.joblib",
-    model_b_path="src/fraud_model_rf.joblib",
+    model_a_path=model_a_path,
+    model_b_path=model_b_path,
     split_ratio=0.5
 )
 
@@ -88,4 +98,5 @@ def ab_stats():
 @app.post("/ab-clear-logs")
 def ab_clear_logs():
     """Clear all A/B test logs"""
-    return ab_manager.clear_logs()
+    result = ab_manager.clear_logs()
+    return result
