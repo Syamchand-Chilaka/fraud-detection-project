@@ -5,11 +5,6 @@ import plotly.express as px
 st.set_page_config(page_title="Fraud Detection A/B Results", layout="wide")
 st.title("Credit Card Fraud Detection - A/B Test Results")
 
-# Load precomputed results
-@st.cache_data
-def load_results():
-    return pd.read_csv("data/predictions_ab.csv")
-
 df = pd.read_csv("data/predictions_ab.csv")
 
 st.success(f"Loaded {len(df):,} predictions")

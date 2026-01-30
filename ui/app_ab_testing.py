@@ -31,8 +31,8 @@ try:
             col1.metric("XGBoost", f"{stats['model_a_avg_fraud_prob']:.4f}")
             col2.metric("Random Forest",
                         f"{stats['model_b_avg_fraud_prob']:.4f}")
-except:
-    st.sidebar.error("API not running")
+except requests.exceptions.RequestException as e:
+    st.sidebar.error(f"API not running: {str(e)}")
 
 # Main area
 st.write("## Upload Transactions")
@@ -54,8 +54,8 @@ if uploaded_file:
                 if response.status_code == 200:
                     result = response.json()
                     results.append(result)
-            except:
-                st.error("API connection failed")
+            except requests.exceptions.RequestException as e:
+                st.error(f"API connection failed: {str(e)}")
                 break
 
             progress.progress((i + 1) / len(df))

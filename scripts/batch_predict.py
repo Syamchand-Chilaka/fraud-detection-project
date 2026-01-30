@@ -3,11 +3,20 @@ import joblib
 from pathlib import Path
 from tqdm import tqdm
 import random
+import sys
 
 DATA_PATH = Path("data/creditcard.csv")
 MODEL_A_PATH = Path("src/fraud_model_xgboost.joblib")
 MODEL_B_PATH = Path("src/fraud_model_rf.joblib")
 OUTPUT_PATH = Path("data/predictions_ab.csv")
+
+# Validate file existence
+if not DATA_PATH.exists():
+    print(f"Error: Data file not found at {DATA_PATH}")
+    sys.exit(1)
+if not MODEL_A_PATH.exists():
+    print(f"Error: Model A not found at {MODEL_A_PATH}")
+    sys.exit(1)
 
 print("Loading data...")
 df = pd.read_csv(DATA_PATH)
@@ -24,7 +33,8 @@ except:
 
 print(f"Running predictions on {len(df)} rows...")
 
-split = random.choices(['A', 'B'], k=len(df))
+# Create A/B split with 50/50 ratio
+split = random.choices(['A', 'B'], weights=[0.5, 0.5], k=len(df))
 
 probas = []
 models_used = []

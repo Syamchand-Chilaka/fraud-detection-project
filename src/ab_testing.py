@@ -25,6 +25,14 @@ class ABTestingManager:
         split_ratio : float, default=0.5
             Percentage of traffic to Model A (0.5 = 50/50 split)
         """
+        from pathlib import Path
+        
+        # Validate model files exist
+        if not Path(model_a_path).exists():
+            raise FileNotFoundError(f"Model A not found at {model_a_path}")
+        if not Path(model_b_path).exists():
+            raise FileNotFoundError(f"Model B not found at {model_b_path}")
+        
         self.model_a = joblib.load(model_a_path)
         self.model_b = joblib.load(model_b_path)
         self.split_ratio = split_ratio
@@ -113,3 +121,12 @@ class ABTestingManager:
         }
 
         return stats
+
+    def clear_logs(self):
+        """Clear all A/B test logs"""
+        try:
+            with open(self.log_file, 'w') as f:
+                json.dump([], f)
+            return {"message": "Logs cleared successfully", "status": "success"}
+        except Exception as e:
+            return {"message": f"Error clearing logs: {str(e)}", "status": "error"}
