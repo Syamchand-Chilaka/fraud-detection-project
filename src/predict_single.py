@@ -16,7 +16,7 @@ def predict_from_csv(path):
         preds = (probs >= 0.5).astype(int)
 
     df["fraud_probability"] = probs
-    df["foaud_predictions"] = preds
+    df["fraud_predictions"] = preds
     return df
 
 
@@ -25,4 +25,4 @@ if __name__ == "__main__":
     input_path = sys.argv[1]
     out = predict_from_csv(input_path)
     out.to_csv("data/predictions.csv", index=False)
-    print("Saved predictions to data/predections.csv")
+    print("Saved predictions to data/predictions.csv")

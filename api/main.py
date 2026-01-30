@@ -8,9 +8,11 @@ sys.path.append("src")
 
 
 app = FastAPI(title="Fraud Detection API with A/B Testing",
-              description="Compare XGBoostvs Random Forest models in production",
+              description="Compare XGBoost vs Random Forest models in production",
               version="2.0"
               )
+
+# Run with: uvicorn api.main:app --reload --port 8002
 
 ab_manager = ABTestingManager(
     model_a_path="src/fraud_model_xgboost.joblib",
